@@ -1,0 +1,14 @@
+name = "quickpara"
+compatibility_date = "2025-01-01"
+pages_build_output_dir = "public"
+
+# Replace database_id with the id printed by:  npx wrangler d1 create quickpara
+[[d1_databases]]
+binding = "DB"
+database_name = "quickpara"
+database_id = "REPLACE_WITH_ID_FROM_d1_create"
+
+# Create with:  npx wrangler r2 bucket create quickpara-photos
+[[r2_buckets]]
+binding = "PHOTOS"
+bucket_name = "quickpara-photos"

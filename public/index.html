@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>QuickPara — Parapharmacie & produits paramédicaux au Maroc</title>
+  <meta name="description" content="Commandez vos produits de parapharmacie et paramédicaux en quelques clics, directement par WhatsApp. Livraison rapide au Maroc.">
+  <meta name="theme-color" content="#0f766e">
+  <meta property="og:title" content="QuickPara — Parapharmacie & paramédical">
+  <meta property="og:description" content="Composez votre panier et commandez directement par WhatsApp.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quickpara.ma">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="header" id="top">
+  <div class="wrap header-in">
+    <a href="#top" class="logo" aria-label="QuickPara, accueil">
+      <span class="logo-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      </span>
+      <span>Quick<b>Para</b></span>
+    </a>
+
+    <label class="search" aria-label="Rechercher un produit">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="search" type="search" placeholder="Rechercher un produit, une marque…" autocomplete="off">
+    </label>
+
+    <button class="cart-btn" id="open-cart" aria-label="Ouvrir le panier">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h2.5l2.2 11h10.1l2-8H6.4"/><circle cx="9" cy="19.5" r="1.4"/><circle cx="17" cy="19.5" r="1.4"/></svg>
+      <span class="cart-label">Panier</span>
+      <span class="badge" id="cart-count" hidden>0</span>
+    </button>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="wrap hero-in">
+      <div class="hero-text">
+        <p class="eyebrow">Parapharmacie &amp; paramédical</p>
+        <h1>Vos produits de santé et de bien-être, <em>commandés en 1 minute.</em></h1>
+        <p class="lead">Choisissez vos produits, composez votre panier et envoyez votre commande directement sur WhatsApp. Nous confirmons et organisons la livraison.</p>
+        <div class="hero-cta">
+          <a href="#produits" class="btn btn-primary">Voir les produits</a>
+          <a href="#" class="btn btn-ghost" data-wa-ask>
+            <svg class="ico" viewBox="0 0 24 24" fill="currentColor"><use href="#wa"/></svg>
+            Poser une question
+          </a>
+        </div>
+      </div>
+      <ul class="steps" aria-label="Comment commander">
+        <li><span>1</span><div><b>Choisissez</b><small>Ajoutez vos produits au panier</small></div></li>
+        <li><span>2</span><div><b>Envoyez</b><small>Votre commande part sur WhatsApp</small></div></li>
+        <li><span>3</span><div><b>Recevez</b><small>Confirmation puis livraison</small></div></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="wrap" id="produits">
+    <div class="section-head">
+      <h2>Nos produits</h2>
+      <p id="result-count" class="muted" aria-live="polite"></p>
+    </div>
+    <div class="chips" id="chips" role="tablist" aria-label="Catégories"></div>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <section class="wrap">
+    <div class="cta-band">
+      <div>
+        <h2>Un produit introuvable ? Une question ?</h2>
+        <p>Écrivez-nous librement sur WhatsApp : conseil, disponibilité, commande spéciale.</p>
+      </div>
+      <a href="#" class="btn btn-wa" data-wa-ask>
+        <svg class="ico" viewBox="0 0 24 24" fill="currentColor"><use href="#wa"/></svg>
+        Discuter sur WhatsApp
+      </a>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="wrap footer-in">
+    <div>
+      <a href="#top" class="logo" aria-label="QuickPara">
+        <span class="logo-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>
+        <span>Quick<b>Para</b></span>
+      </a>
+      <p class="muted small">Parapharmacie &amp; produits paramédicaux.<br>quickpara.ma</p>
+    </div>
+    <div class="small">
+      <b>Commander</b>
+      <p class="muted">Par WhatsApp uniquement.<br><span id="footer-hours"></span></p>
+    </div>
+    <div class="small disclaimer">
+      Les informations présentées ne remplacent pas l'avis d'un médecin ou d'un pharmacien. Prix indicatifs en dirhams (MAD), confirmés lors de votre commande.
+    </div>
+  </div>
+</footer>
+
+<!-- Floating WhatsApp -->
+<a href="#" class="fab" data-wa-ask aria-label="Nous écrire sur WhatsApp">
+  <svg class="ico" viewBox="0 0 24 24" fill="currentColor"><use href="#wa"/></svg>
+</a>
+
+<!-- Cart drawer -->
+<div class="overlay" id="overlay" hidden></div>
+<aside class="drawer" id="drawer" aria-label="Panier" aria-hidden="true">
+  <div class="drawer-head">
+    <h2>Votre panier</h2>
+    <button class="icon-btn" id="close-cart" aria-label="Fermer le panier">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+  </div>
+
+  <div class="drawer-body" id="cart-body"></div>
+
+  <div class="drawer-foot" id="cart-foot" hidden>
+    <div class="fields">
+      <input id="f-name" type="text" placeholder="Votre nom" autocomplete="name">
+      <input id="f-city" type="text" placeholder="Ville / quartier" autocomplete="address-level2">
+      <textarea id="f-note" rows="2" placeholder="Adresse, précisions… (facultatif)"></textarea>
+    </div>
+    <div class="total"><span>Total estimé</span><b id="cart-total">0 MAD</b></div>
+    <button class="btn btn-wa btn-block" id="checkout">
+      <svg class="ico" viewBox="0 0 24 24" fill="currentColor"><use href="#wa"/></svg>
+      Commander sur WhatsApp
+    </button>
+    <button class="link-btn" id="clear-cart">Vider le panier</button>
+  </div>
+</aside>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<!-- Icon sprite -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="wa" viewBox="0 0 24 24"><path d="M12.04 2a9.9 9.9 0 0 0-8.44 15.1L2 22l5.04-1.58A9.9 9.9 0 1 0 12.04 2Zm0 1.8a8.1 8.1 0 1 1-4.3 14.96l-.3-.19-2.99.94.97-2.9-.2-.31A8.1 8.1 0 0 1 12.04 3.8Zm-3.2 3.9c-.2 0-.5.07-.76.35-.26.29-1 .98-1 2.4s1.03 2.78 1.17 2.97c.15.2 2 3.2 4.93 4.36 2.43.96 2.93.77 3.46.72.53-.05 1.7-.69 1.94-1.36.24-.67.24-1.25.17-1.36-.07-.12-.26-.19-.55-.33-.29-.15-1.7-.84-1.97-.94-.26-.1-.46-.14-.65.15-.2.29-.75.94-.92 1.13-.17.2-.34.22-.63.07-.29-.14-1.22-.45-2.32-1.43-.86-.77-1.44-1.71-1.6-2-.17-.29-.02-.45.13-.6.13-.13.29-.34.43-.5.14-.17.19-.29.29-.48.1-.2.05-.36-.02-.5-.07-.15-.65-1.58-.9-2.16-.23-.56-.47-.48-.65-.49h-.55Z"/></symbol>
+</svg>
+
+<script src="js/app.js"></script>
+</body>
+</html>

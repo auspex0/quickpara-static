@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#0f766e">
+  <title>QuickPara Admin</title>
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+<!-- Sign in -->
+<main class="login" id="login-view" hidden>
+  <form class="login-card" id="login-form" autocomplete="on">
+    <span class="logo-mark" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+    </span>
+    <h1>QuickPara Admin</h1>
+    <p class="muted">Sign in to manage your products.</p>
+    <input type="text" name="username" value="admin" autocomplete="username" hidden>
+    <label class="field">
+      <span>Password</span>
+      <input type="password" id="password" autocomplete="current-password" required autofocus>
+    </label>
+    <p class="error" id="login-error" role="alert"></p>
+    <button class="btn btn-primary btn-block" type="submit" id="login-btn">Sign in</button>
+  </form>
+</main>
+
+<!-- App -->
+<div id="app-view" hidden>
+  <header class="top">
+    <div class="wrap top-in">
+      <span class="brand-lg">
+        <span class="logo-mark sm" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>
+        Quick<b>Para</b> <em>Admin</em>
+      </span>
+      <nav class="top-links">
+        <a href="/" target="_blank" rel="noopener">View site ↗</a>
+        <button class="link-btn" id="logout">Sign out</button>
+      </nav>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" data-tab="products" aria-selected="true">Products</button>
+      <button class="tab" role="tab" data-tab="categories" aria-selected="false">Categories</button>
+      <button class="tab" role="tab" data-tab="settings" aria-selected="false">Settings</button>
+    </div>
+
+    <!-- Products -->
+    <section id="tab-products" class="panel">
+      <div class="toolbar">
+        <input type="search" id="p-search" placeholder="Search products…" aria-label="Search products">
+        <select id="p-filter" aria-label="Filter by category"></select>
+        <button class="btn btn-primary" id="p-new">+ New product</button>
+      </div>
+      <p class="muted small" id="p-count"></p>
+      <div class="list" id="p-list"></div>
+    </section>
+
+    <!-- Categories -->
+    <section id="tab-categories" class="panel" hidden>
+      <div class="card-box">
+        <h2>New category</h2>
+        <form class="inline-form" id="c-new-form">
+          <input type="text" id="c-new-label" placeholder="Category name" maxlength="40" required>
+          <select id="c-new-icon" aria-label="Icon"></select>
+          <button class="btn btn-primary" type="submit">Add</button>
+        </form>
+      </div>
+      <div class="list" id="c-list"></div>
+    </section>
+
+    <!-- Settings -->
+    <section id="tab-settings" class="panel" hidden>
+      <form class="card-box narrow" id="s-form">
+        <h2>Store settings</h2>
+        <label class="field"><span>WhatsApp number</span>
+          <input type="tel" id="s-whatsapp" required placeholder="212612345678">
+          <small class="muted">International format. A Moroccan 06… number is converted automatically.</small>
+        </label>
+        <label class="field"><span>Store name</span>
+          <input type="text" id="s-name" maxlength="40" required>
+        </label>
+        <label class="field"><span>Opening hours (shown in footer)</span>
+          <input type="text" id="s-hours" maxlength="60" placeholder="Lun–Sam, 9h–20h">
+        </label>
+        <p class="error" id="s-error" role="alert"></p>
+        <button class="btn btn-primary" type="submit">Save settings</button>
+      </form>
+    </section>
+  </div>
+</div>
+
+<!-- Product dialog -->
+<dialog id="p-dialog">
+  <form id="p-form" method="dialog">
+    <div class="dlg-head">
+      <h2 id="p-dialog-title">New product</h2>
+      <button type="button" class="icon-btn" id="p-cancel-x" aria-label="Close">✕</button>
+    </div>
+    <div class="dlg-body">
+      <div class="photo">
+        <div class="photo-preview" id="p-photo-preview"></div>
+        <div class="photo-actions">
+          <label class="btn btn-ghost sm">
+            Choose photo
+            <input type="file" id="p-photo" accept="image/jpeg,image/png,image/webp" hidden>
+          </label>
+          <button type="button" class="link-btn" id="p-photo-remove" hidden>Remove photo</button>
+          <small class="muted">Resized automatically. Optional.</small>
+        </div>
+      </div>
+
+      <label class="field"><span>Name *</span><input type="text" id="p-name" maxlength="120" required></label>
+      <div class="two">
+        <label class="field"><span>Brand</span><input type="text" id="p-brand" maxlength="60"></label>
+        <label class="field"><span>Price (MAD) *</span><input type="number" id="p-price" min="0" step="0.01" inputmode="decimal" required></label>
+      </div>
+      <label class="field"><span>Category</span><select id="p-category"></select></label>
+      <label class="field"><span>Short description</span><textarea id="p-desc" rows="2" maxlength="300" placeholder="e.g. 200 ml, peaux sèches"></textarea></label>
+      <label class="check"><input type="checkbox" id="p-visible" checked> Visible on the website</label>
+      <p class="error" id="p-error" role="alert"></p>
+    </div>
+    <div class="dlg-foot">
+      <button type="button" class="btn btn-ghost" id="p-cancel">Cancel</button>
+      <button type="submit" class="btn btn-primary" id="p-save">Save</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="admin.js"></script>
+</body>
+</html>
