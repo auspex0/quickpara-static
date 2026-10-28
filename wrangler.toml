@@ -6,7 +6,7 @@ pages_build_output_dir = "public"
 [[d1_databases]]
 binding = "DB"
 database_name = "quickpara"
-database_id = "REPLACE_WITH_ID_FROM_d1_create"
+database_id = "eecee1d4-a32a-440c-8941-ee502c776b3c"
 
 # Create with:  npx wrangler r2 bucket create quickpara-photos
 [[r2_buckets]]
