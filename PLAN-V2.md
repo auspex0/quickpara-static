@@ -1,7 +1,53 @@
 # QuickPara v2 — implementation plan
 
 Audience: the agent implementing this (and the owner reviewing it).
-Status: **approved scope, not started.** Do not add features beyond this list.
+Status: **all items (0, F, C, D, E, G, B, A, H) and the docs are implemented and tested locally: 31/31 tests. Not committed, not deployed. Remaining: the release (step 9.5), with the owner's OK.** Do not add features beyond this list.
+
+## A and H — what was built (Opus)
+
+- `db/migrations/0003_orders.sql`: `orders` (with a random `ref` used to link lines inside one atomic batch), `order_items` (name and price snapshot), `rate_limits`.
+- `functions/api/orders.js` (public `POST /api/orders`): JSON only, same-origin, 10 orders/hour per visitor, 1–50 lines, qty 1–99, prices read from D1, hidden/unknown products → 400 with `unavailable: [ids]`, zone required when zones exist, `minOrder` enforced, fee rule shared in `src/lib/delivery.js` (cents, `>=` at the threshold, same as the shop's `feeFor`). Order + lines + rate mark saved in one D1 batch (transaction).
+- Storefront checkout: the tab is opened during the click (pop-up rule), then filled with the WhatsApp link once the order is saved. 400 → tab closed and the reason shown in the cart (and the catalogue refreshed if a product disappeared); 429/5xx/offline → WhatsApp still opens with the message without a number. The cart subtotal is now summed in cents like the server.
+- Admin: **Commandes** tab (first tab, red count of new orders), filter by status, search by number or name, details on click, status select. `GET /api/admin/orders`, `PUT /api/admin/orders/:id`.
+- H: `functions/index.js` (home) and `functions/c/[slug].js` use `src/lib/seo.js` (HTMLRewriter: title, description, canonical, Open Graph, JSON-LD Store + ItemList of Products). Pages are cached 5 min at the edge (Cache API, skipped on localhost) and sent to browsers with `no-cache` so edits show at once. `functions/sitemap.xml.js`, `public/robots.txt`. `SITE_URL` var in `wrangler.toml`. Category slugs: generated on create, kept on rename, editable and validated in the admin; description (160 chars) used as the page's meta description.
+- Docs: handbook rewritten for the French console and the new features; deploy guide has "Passer à une nouvelle version" and Google Search Console sections.
+
+### Known limits
+- Checked in Chrome (desktop and 375 px emulation) only. The built-in test browser refuses new tabs, so the real-click test exercised the same-tab fallback; the new-tab path still needs a check on a real phone (Safari and Chrome) after release.
+- An order is saved on click, so abandoned clicks stay "Nouvelle"; a double click on two separate occasions makes two orders. Documented in the handbook.
+- The sitemap has no `<lastmod>` (no "updated at" column).
+
+## Handover notes (read before continuing with A and H)
+
+### What is done, and verified
+- `npm test`: **19/19 pass** (run twice, on a freshly rebuilt local database). Browser checks done at 375 px and desktop widths: badges and crossed-out prices, brand filter (spelling variants grouped), featured first, cart delivery totals, minimum order, WhatsApp message, French admin (product dialog, arrows, star, zones tab).
+- Delivery boundary verified in the browser with 25 MAD items: 275 MAD → fee 20 + hint "Plus que 25 MAD"; exactly 300 MAD → free; below the minimum → checkout disabled.
+- The migration was tested as a real upgrade: local DB built in the old shape with the 14 demo products, then `migrations apply`: all products kept, positions set to `-id`.
+
+### What changed vs the plan text above
+- `db/schema.sql` was **moved** to `db/migrations/0001_initial.sql` (idempotent). `db/migrations/0002_v2.sql` holds: `old_price`, `is_new`, `featured`, `position` on products; `slug`, `description` on categories (default categories already have slugs; **new categories get a NULL slug until step H handles it**); `delivery_zones`. The `orders`, `order_items` and `rate_limits` tables are **not** created yet: step A must add them in `0003_orders.sql`.
+- `package.json`: `db:local` / `db:remote` now run `wrangler d1 migrations apply`. `wrangler.toml` has `migrations_dir = "db/migrations"` and the real D1 id.
+- `GUIDE-DEPLOIEMENT.md` step 4 and `README.md` were touched only to stop pointing at `schema.sql`. The full docs update (step 9) is still to do.
+- Public asset paths are absolute (`/css/style.css`, `/js/app.js`), and the admin page uses `/admin/admin.css` and `/admin/admin.js`.
+
+### Contracts that A and H must reuse
+- **Delivery rule**, client side in `public/js/app.js` function `feeFor(zone, subtotal)`: `zone.freeFrom` set and `subtotal >= freeFrom` → fee 0, otherwise `zone.fee`. The server (step A) must implement the **same** rule (`free_from` column) and the same `>=`. Add a boundary test on the server (subtotal exactly at `free_from`).
+- **Minimum order**: stored in `settings.minOrder` (null = none). The storefront blocks checkout below it, but **the server in step A must also enforce it** (400).
+- **Catalogue shape** (`GET /api/catalog`): products have `oldPrice`, `isNew` (no `featured`, no `visible`); `settings` has `minOrder` and `social {instagram, facebook, maps, googleBusiness}`; top-level `zones [{id,label,fee,freeFrom}]`. Product order is `featured DESC, position ASC, id DESC`.
+- **Settings endpoint** `PUT /api/admin/settings` **replaces the whole set**: the admin always sends every field (`whatsapp, storeName, hours, minOrder, instagram, facebook, maps, googleBusiness`); omitted optional fields are cleared. Tests restore with the full object from `/api/admin/data`.
+- **Reorder endpoints** (`/products/order`, `/zones/order`) require the **complete** list of ids (400 invalid, 409 if the list is stale).
+- Admin UI conventions: French vocabulary already fixed in `public/admin/index.html` / `admin.js` (Produits, Catégories, Livraison, Réglages, Enregistrer, Annuler, Supprimer, « Se connecter »…). Server error messages are French. Add the **Commandes** tab in the same style.
+- Rate limiting pattern to copy for A: `login()` in `functions/api/admin/[[path]].js` (table per bucket, window, 429). For tests use a fresh random `CF-Connecting-IP` per run (see the login lockout test).
+
+### Local environment
+- Start: `npm run dev` (port 5173). Reset the local DB to the live shape + demo data: delete `.wrangler/state/v3/d1`, then `wrangler d1 execute quickpara --local --file=db/migrations/0001_initial.sql`, `... --file=db/seed-demo.sql`, `echo y | wrangler d1 migrations apply quickpara --local`.
+- The test "by default nothing changes for shoppers" requires **no delivery zones and no minimum order** in the DB it runs against.
+- The local test password is in `.dev.vars` (git-ignored).
+
+### Not done / still needs the owner
+- Nothing is committed or pushed. The **live database is still at the old schema** and the live site is the old version. Release order stays: backup → `migrations apply --remote` → deploy → live smoke test (no lockout or rate-limit tests on production) → commit and push, **each with the owner's OK**.
+- The handbook (`MANUEL-UTILISATEUR.md`) still describes the English admin: rewrite in step 9 using the French vocabulary above.
+- Browser checks on a real phone (not only emulation) are still to do by the owner for the checkout flow after step A.
 
 ## Ground rules (read first)
 

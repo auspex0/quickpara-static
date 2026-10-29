@@ -61,14 +61,14 @@ database_id = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
 ```
 1. **Copier** la valeur entre guillemets (l'identifiant).
 2. Ouvrir le fichier **`wrangler.toml`** (clic droit → Ouvrir avec → Bloc-notes).
-3. Remplacer `REPLACE_WITH_ID_FROM_d1_create` par cet identifiant (garder les guillemets).
+3. Remplacer la valeur de `database_id` par cet identifiant (garder les guillemets). *(Le dépôt contient l'identifiant de la base actuelle de quickpara.ma : sur un nouveau compte Cloudflare, il faut le remplacer.)*
 4. Enregistrer (Ctrl+S).
 
 Puis créer les tables (la structure) :
 ```powershell
-npx wrangler d1 execute quickpara --remote --file=db/schema.sql
+npx wrangler d1 migrations apply quickpara --remote
 ```
-Si Wrangler demande « Ok to proceed? », taper `y` puis Entrée. Cela crée aussi les 6 catégories de départ (Visage, Corps & cheveux, Bébé & maman, Compléments, Hygiène, Premiers soins) que vous pourrez modifier ensuite.
+Si Wrangler demande « Ok to proceed? », taper `y` puis Entrée. Cette commande applique, dans l'ordre, tous les fichiers du dossier `db/migrations` (0001, 0002, 0003…) et retient ceux déjà appliqués. Elle crée aussi les 6 catégories de départ (Visage, Corps & cheveux, Bébé & maman, Compléments, Hygiène, Premiers soins) que vous pourrez modifier ensuite.
 
 > ⚠️ Ne **jamais** lancer `db/seed-demo.sql` en ligne : ce sont des produits d'exemple pour les tests.
 
@@ -114,10 +114,11 @@ Ouvrir **https://quickpara.pages.dev** (ou l'adresse affichée à l'étape 9).
 
 1. Le site s'affiche. Il ne contient pas encore de produits : le message « Le catalogue arrive très bientôt » est normal.
 2. Aller sur **https://quickpara.pages.dev/admin** → saisir le mot de passe de l'étape 7 → vous arrivez dans la console.
-3. Onglet **Settings** : saisir votre **vrai numéro WhatsApp** (par exemple `0612345678` : il est converti automatiquement en `212612345678`), vérifier le nom du magasin et les horaires → **Save settings**.
-4. Onglet **Products** → **+ New product** → ajouter un premier produit avec une photo → **Save**.
-5. Revenir sur le site (bouton « View site »), recharger la page : le produit apparaît.
-6. **Test de commande** : ajouter le produit au panier, cliquer **Commander sur WhatsApp**. WhatsApp doit s'ouvrir avec le message de commande **vers votre numéro**. Avec votre téléphone, testez aussi : le message arrive bien dans WhatsApp Business.
+3. Onglet **Réglages** : saisir votre **vrai numéro WhatsApp** (par exemple `0612345678` : il est converti automatiquement en `212612345678`), vérifier le nom du magasin et les horaires → **Enregistrer les réglages**.
+4. Onglet **Produits** → **+ Nouveau produit** → ajouter un premier produit avec une photo → **Enregistrer**.
+5. Revenir sur le site (bouton **Voir le site ↗**), recharger la page : le produit apparaît.
+6. **Test de commande** : ajouter le produit au panier, cliquer **Commander sur WhatsApp**. WhatsApp doit s'ouvrir avec un message qui commence par « … (commande **QP-1001**) » **vers votre numéro**. Avec votre téléphone, testez aussi : le message arrive bien dans WhatsApp Business.
+7. Dans la console, onglet **Commandes** : la commande QP-1001 apparaît. Passez-la en **Annulée** (c'était un test).
 
 Si une de ces vérifications échoue, voir « Dépannage » plus bas.
 
@@ -199,6 +200,32 @@ Ouvrir **https://quickpara.ma**, **https://www.quickpara.ma** et **https://quick
 - **Changer le design ou le code** : modifier les fichiers puis relancer l'étape 9.
 - **Changer le mot de passe admin** : refaire l'étape 7, puis relancer l'étape 9 (nouveau déploiement).
 
+## Passer à une nouvelle version du site (exemple : la v2)
+Quand le code change **et** que la base de données doit évoluer (nouveaux fichiers dans `db/migrations`), toujours dans cet ordre :
+
+1. **Sauvegarde** de la base en ligne (voir « Sauvegarde » ci-dessous). Vérifier que le fichier est bien créé et non vide.
+2. **Faire évoluer la base** :
+   ```powershell
+   npx wrangler d1 migrations list quickpara --remote
+   npx wrangler d1 migrations apply quickpara --remote
+   ```
+   La première commande montre ce qui va être appliqué. Pour la v2 sur quickpara.ma : `0001_initial.sql` (déjà en place : sans effet), `0002_v2.sql` et `0003_orders.sql`.
+3. **Publier le nouveau code** : étape 9.
+4. **Vérifier en ligne** (comme l'étape 10) : le site, `/admin`, une **commande test** (puis l'annuler dans **Commandes**), une page de catégorie comme `/c/visage`, et `/sitemap.xml`.
+   - ⚠️ Ne **pas** lancer `npm test` contre le site en ligne : certains tests bloquent volontairement l'adresse de connexion pendant 15 minutes à 1 heure.
+5. **Si quelque chose ne va pas** : Cloudflare → Workers & Pages → quickpara → **Deployments** → choisir le déploiement précédent → **Rollback** (retour au code d'avant en un clic). Les migrations ne font qu'**ajouter** des colonnes et des tables : l'ancien code continue de fonctionner avec la nouvelle base.
+
+## Être trouvé sur Google (Search Console)
+À faire une fois, après la mise en ligne sur quickpara.ma :
+
+1. Aller sur https://search.google.com/search-console avec un compte Google → **Ajouter une propriété** → type **Domaine** → saisir `quickpara.ma`.
+2. Google affiche un enregistrement **TXT** (`google-site-verification=…`). Le copier.
+3. Cloudflare → `quickpara.ma` → **DNS** → **Add record** → Type `TXT`, Name `@`, Content = la valeur copiée → **Save**. (Ne touchez pas aux autres enregistrements, en particulier ceux des e-mails.)
+4. Retour dans Search Console → **Valider** (quelques minutes, parfois quelques heures).
+5. Menu **Sitemaps** → saisir `sitemap.xml` → **Envoyer**.
+
+Les pages apparaissent dans Google après **quelques jours à quelques semaines**. Chaque catégorie a sa page (`quickpara.ma/c/visage`…) : remplissez leur **Description pour Google** dans l'onglet **Catégories** de la console.
+
 ## Sauvegarde
 Les produits sont dans la base D1, les photos dans R2. Pour sauvegarder les produits :
 ```powershell
@@ -211,12 +238,15 @@ Le fichier `sauvegarde-produits.sql` est créé dans le dossier. À garder aille
 | Symptôme | Cause probable | Que faire |
 |---|---|---|
 | Le site affiche « Impossible de charger le catalogue » | La base n'est pas reliée | Vérifier que `database_id` est bien rempli dans `wrangler.toml` (étape 4), et que l'étape 4 « Créer les tables » a été faite avec `--remote`. Puis relancer l'étape 9. |
-| `/admin` affiche « Admin is not configured » | Les secrets manquent | Refaire les étapes 7 et 8, puis l'étape 9. |
-| « Wrong password » alors que le mot de passe est bon | Faute de frappe lors de l'étape 7 | Refaire l'étape 7 puis l'étape 9. |
-| « Too many attempts » | 5 erreurs de mot de passe | Attendre 15 minutes. |
+| `/admin` affiche « L'administration n'est pas configurée » | Les secrets manquent | Refaire les étapes 7 et 8, puis l'étape 9. |
+| « Mot de passe incorrect » alors que le mot de passe est bon | Faute de frappe lors de l'étape 7 | Refaire l'étape 7 puis l'étape 9. |
+| « Trop de tentatives » | 5 erreurs de mot de passe | Attendre 15 minutes. |
+| Les messages WhatsApp n'ont jamais de numéro « QP-… » et l'onglet **Commandes** reste vide | La base n'a pas la table des commandes | `npx wrangler d1 migrations list quickpara --remote` : appliquer ce qui manque (voir « Passer à une nouvelle version »). |
+| La console affiche une erreur dans **Livraison** ou **Commandes** après une mise à jour | Migrations pas appliquées en ligne | Même commande que ci-dessus. |
+| Une page `quickpara.ma/c/…` affiche « Page introuvable » | Adresse de catégorie changée ou inexistante | Console → **Catégories** : vérifier l'adresse de la catégorie. |
 | L'envoi d'une photo échoue | Photo trop lourde ou format non supporté | Utiliser une photo JPEG, PNG ou WebP. Elle est réduite automatiquement. |
 | Les photos ne s'affichent pas | R2 non activé / bucket absent | Refaire l'étape 5, vérifier le nom `quickpara-photos` dans `wrangler.toml`, puis étape 9. |
-| WhatsApp s'ouvre vers un mauvais numéro | Numéro non mis à jour | `/admin` → Settings → corriger le numéro → Save settings. |
+| WhatsApp s'ouvre vers un mauvais numéro | Numéro non mis à jour | `/admin` → **Réglages** → corriger le numéro → **Enregistrer les réglages**. |
 | La commande `npx` ou `node` n'est pas reconnue | Node.js absent | Installer Node.js (voir « Ce dont vous avez besoin »), fermer et rouvrir PowerShell. |
 | Une commande Wrangler dit « not authenticated » | Session expirée | Refaire l'étape 3. |
 

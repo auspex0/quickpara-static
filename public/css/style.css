@@ -105,6 +105,7 @@ a { color: inherit; }
 .btn-wa:hover { background: var(--wa-dark); }
 .btn-block { width: 100%; }
 .btn[disabled] { opacity: .5; pointer-events: none; }
+.btn.busy { opacity: .7; pointer-events: none; }
 
 /* ---------- Hero ---------- */
 .hero {
@@ -151,8 +152,18 @@ h1 em { font-style: normal; color: var(--brand); }
 h2 { margin: 0; font-size: 1.75rem; letter-spacing: -.025em; }
 .section-head p { margin: 0; font-size: .92rem; }
 
+.filters { display: flex; align-items: center; gap: 12px; margin-bottom: 26px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.brand-select { flex: none; }
+.brand-select select {
+  height: 42px; padding: 0 38px 0 16px; max-width: 220px;
+  background: #fff; border: 1px solid var(--line); border-radius: 999px;
+  font-weight: 600; font-size: .92rem;
+}
+.brand-select select:focus { outline: 0; border-color: var(--brand); box-shadow: 0 0 0 4px var(--brand-soft); }
 .chips {
-  display: flex; gap: 8px; margin: 0 -20px 26px; padding: 4px 20px;
+  flex: 1; min-width: 0;
+  display: flex; gap: 8px; margin: 0; padding: 4px 4px;
   overflow-x: auto; scrollbar-width: none;
 }
 .chips::-webkit-scrollbar { display: none; }
@@ -209,6 +220,13 @@ h2 { margin: 0; font-size: 1.75rem; letter-spacing: -.025em; }
 .card-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: auto; }
 .price { font-size: 1.15rem; font-weight: 800; letter-spacing: -.02em; }
 .price small { font-size: .75rem; font-weight: 700; color: var(--muted); margin-left: 2px; }
+.price-col { display: flex; flex-direction: column; line-height: 1.15; }
+.old { font-size: .78rem; color: var(--muted); font-weight: 600; }
+
+.badges { position: absolute; top: 10px; left: 10px; z-index: 1; display: flex; flex-wrap: wrap; gap: 6px; max-width: calc(100% - 20px); }
+.badge-tag { font-size: .72rem; font-weight: 800; letter-spacing: .02em; padding: 4px 10px; border-radius: 999px; background: #fff; color: var(--ink); box-shadow: 0 2px 8px rgba(18, 48, 45, .12); white-space: nowrap; }
+.badge-promo { background: #d9382c; color: #fff; }
+.badge-new { background: var(--brand); color: #fff; }
 
 .add {
   height: 40px; padding: 0 16px; border: 0; border-radius: 999px;
@@ -252,6 +270,10 @@ h2 { margin: 0; font-size: 1.75rem; letter-spacing: -.025em; }
 .footer-in { display: grid; grid-template-columns: 1fr 1fr 1.6fr; gap: 32px; }
 .footer p { margin: 8px 0 0; }
 .disclaimer { color: var(--muted); }
+.social { display: flex; gap: 10px; margin-top: 14px; }
+.social a { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 12px; background: var(--brand-soft); color: var(--brand-dark); transition: background .15s, color .15s; }
+.social a:hover { background: var(--brand); color: #fff; }
+.social svg { width: 19px; height: 19px; }
 
 /* ---------- Floating WhatsApp ---------- */
 .fab {
@@ -314,8 +336,18 @@ h2 { margin: 0; font-size: 1.75rem; letter-spacing: -.025em; }
   border: 1px solid var(--line); border-radius: 12px; background: #fff; resize: none; font-size: .92rem;
 }
 .fields input:focus, .fields textarea:focus { outline: 0; border-color: var(--brand); box-shadow: 0 0 0 4px var(--brand-soft); }
+.fields select {
+  width: 100%; padding: 12px 14px;
+  border: 1px solid var(--line); border-radius: 12px; background: #fff; font-size: .92rem;
+}
+.fields select:focus { outline: 0; border-color: var(--brand); box-shadow: 0 0 0 4px var(--brand-soft); }
+.sum { display: grid; gap: 4px; margin-bottom: 8px; font-size: .92rem; color: var(--muted); }
+.sum-row { display: flex; justify-content: space-between; }
+.sum-row b { color: var(--ink); }
 .total { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 14px; }
 .total b { font-size: 1.4rem; letter-spacing: -.02em; }
+.cart-hint { margin: -4px 0 12px; padding: 9px 12px; border-radius: 10px; background: var(--brand-soft); color: var(--brand-dark); font-size: .86rem; font-weight: 600; }
+.cart-hint.warn { background: #fff3e0; color: #8a4b00; }
 .link-btn { display: block; margin: 12px auto 0; border: 0; background: none; color: var(--muted); font-size: .86rem; text-decoration: underline; }
 .link-btn:hover { color: var(--ink); }
 
@@ -339,7 +371,9 @@ h2 { margin: 0; font-size: 1.75rem; letter-spacing: -.025em; }
 }
 @media (max-width: 620px) {
   .wrap { width: calc(100% - 32px); }
-  .chips { margin: 0 -16px 22px; padding: 4px 16px; }
+  .filters { flex-direction: column; align-items: stretch; gap: 10px; margin-bottom: 22px; }
+  .chips { margin: 0 -16px; padding: 4px 16px; flex: none; }
+  .brand-select select { width: 100%; max-width: none; }
   .header-in { flex-wrap: wrap; height: auto; padding: 12px 0; gap: 10px; }
   .search { order: 3; flex-basis: 100%; max-width: none; margin-left: 0; }
   .cart-btn { margin-left: auto; }

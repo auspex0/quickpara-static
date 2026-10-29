@@ -4,7 +4,8 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "db:local": "wrangler d1 execute quickpara --local --file=db/schema.sql",
+    "db:local": "wrangler d1 migrations apply quickpara --local",
+    "db:remote": "wrangler d1 migrations apply quickpara --remote",
     "db:demo": "wrangler d1 execute quickpara --local --file=db/seed-demo.sql",
     "dev": "wrangler pages dev public --port 5173",
     "test": "node --test tests/api.test.mjs"

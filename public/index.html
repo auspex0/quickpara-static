@@ -10,11 +10,11 @@
   <meta property="og:description" content="Composez votre panier et commandez directement par WhatsApp.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://quickpara.ma">
-  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
 
@@ -68,7 +68,13 @@
       <h2>Nos produits</h2>
       <p id="result-count" class="muted" aria-live="polite"></p>
     </div>
-    <div class="chips" id="chips" role="tablist" aria-label="Catégories"></div>
+    <div class="filters">
+      <div class="chips" id="chips" role="tablist" aria-label="Catégories"></div>
+      <label class="brand-select" id="brand-wrap" hidden>
+        <span class="sr">Marque</span>
+        <select id="brand" aria-label="Filtrer par marque"></select>
+      </label>
+    </div>
     <div class="grid" id="grid"></div>
   </section>
 
@@ -94,6 +100,7 @@
         <span>Quick<b>Para</b></span>
       </a>
       <p class="muted small">Parapharmacie &amp; produits paramédicaux.<br>quickpara.ma</p>
+      <div class="social" id="social" hidden></div>
     </div>
     <div class="small">
       <b>Commander</b>
@@ -124,11 +131,17 @@
 
   <div class="drawer-foot" id="cart-foot" hidden>
     <div class="fields">
+      <select id="f-zone" aria-label="Zone de livraison" hidden></select>
       <input id="f-name" type="text" placeholder="Votre nom" autocomplete="name">
       <input id="f-city" type="text" placeholder="Ville / quartier" autocomplete="address-level2">
       <textarea id="f-note" rows="2" placeholder="Adresse, précisions… (facultatif)"></textarea>
     </div>
-    <div class="total"><span>Total estimé</span><b id="cart-total">0 MAD</b></div>
+    <div class="sum">
+      <div class="sum-row"><span>Sous-total</span><b id="sum-sub">0 MAD</b></div>
+      <div class="sum-row" id="sum-del-row" hidden><span>Livraison</span><b id="sum-del"></b></div>
+    </div>
+    <div class="total"><span id="total-label">Total estimé</span><b id="cart-total">0 MAD</b></div>
+    <p class="cart-hint" id="cart-hint" hidden></p>
     <button class="btn btn-wa btn-block" id="checkout">
       <svg class="ico" viewBox="0 0 24 24" fill="currentColor"><use href="#wa"/></svg>
       Commander sur WhatsApp
@@ -144,6 +157,6 @@
   <symbol id="wa" viewBox="0 0 24 24"><path d="M12.04 2a9.9 9.9 0 0 0-8.44 15.1L2 22l5.04-1.58A9.9 9.9 0 1 0 12.04 2Zm0 1.8a8.1 8.1 0 1 1-4.3 14.96l-.3-.19-2.99.94.97-2.9-.2-.31A8.1 8.1 0 0 1 12.04 3.8Zm-3.2 3.9c-.2 0-.5.07-.76.35-.26.29-1 .98-1 2.4s1.03 2.78 1.17 2.97c.15.2 2 3.2 4.93 4.36 2.43.96 2.93.77 3.46.72.53-.05 1.7-.69 1.94-1.36.24-.67.24-1.25.17-1.36-.07-.12-.26-.19-.55-.33-.29-.15-1.7-.84-1.97-.94-.26-.1-.46-.14-.65.15-.2.29-.75.94-.92 1.13-.17.2-.34.22-.63.07-.29-.14-1.22-.45-2.32-1.43-.86-.77-1.44-1.71-1.6-2-.17-.29-.02-.45.13-.6.13-.13.29-.34.43-.5.14-.17.19-.29.29-.48.1-.2.05-.36-.02-.5-.07-.15-.65-1.58-.9-2.16-.23-.56-.47-.48-.65-.49h-.55Z"/></symbol>
 </svg>
 
-<script src="js/app.js"></script>
+<script src="/js/app.js"></script>
 </body>
 </html>

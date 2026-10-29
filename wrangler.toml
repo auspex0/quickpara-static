@@ -2,11 +2,16 @@ name = "quickpara"
 compatibility_date = "2025-01-01"
 pages_build_output_dir = "public"
 
+# Public address used for canonical links, sitemap and product data.
+[vars]
+SITE_URL = "https://quickpara.ma"
+
 # Replace database_id with the id printed by:  npx wrangler d1 create quickpara
 [[d1_databases]]
 binding = "DB"
 database_name = "quickpara"
 database_id = "eecee1d4-a32a-440c-8941-ee502c776b3c"
+migrations_dir = "db/migrations"
 
 # Create with:  npx wrangler r2 bucket create quickpara-photos
 [[r2_buckets]]
