@@ -57,6 +57,7 @@ a { color: inherit; }
   background: var(--brand); color: #fff;
 }
 .logo-mark svg { width: 18px; height: 18px; }
+.logo-img { width: 46px; height: 46px; object-fit: contain; flex: none; }
 
 .search {
   flex: 1; max-width: 460px; margin-left: auto;
