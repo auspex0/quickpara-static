@@ -162,9 +162,34 @@ Si vous ne pouvez pas changer les serveurs de noms : chez votre registrar, crée
 Ouvrir **https://quickpara.ma**, **https://www.quickpara.ma** et **https://quickpara.ma/admin** sur ordinateur **et** sur téléphone, passer une commande test complète, puis supprimer le produit de test si besoin.
 
 **Si une adresse « ne se trouve pas » alors que l'autre fonctionne** : c'est presque toujours le cache DNS de votre ordinateur ou de votre box, qui a mémorisé l'ancienne réponse « ce nom n'existe pas ». Le site, lui, est en ligne.
-- Vider le cache de l'ordinateur : `ipconfig /flushdns` (PowerShell), et dans Chrome `chrome://net-internals/#dns` → **Clear host cache**.
 - Tester depuis le téléphone en **4G/5G** (Wi-Fi coupé) : si ça marche, c'est bien un cache local.
-- Sinon redémarrer la box, ou régler le DNS de l'ordinateur sur `1.1.1.1`. Ça se résout seul au bout de quelques heures au plus.
+- Vider le cache de l'ordinateur :
+
+  **Windows (PowerShell)**
+  ```powershell
+  ipconfig /flushdns
+  ```
+
+  **Mac (Terminal)** : le mot de passe du Mac est demandé ; rien ne s'affiche pendant la saisie, c'est normal.
+  ```bash
+  sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder
+  ```
+
+  **Navigateur**
+  - Chrome : ouvrir `chrome://net-internals/#dns` → **Clear host cache**.
+  - Safari : pas de cache DNS séparé ; quitter complètement Safari (⌘Q) puis le rouvrir.
+- Sinon, redémarrer la box, ou faire utiliser à l'ordinateur le DNS de Cloudflare (`1.1.1.1` et `1.0.0.1`) :
+  - **Windows** : Paramètres → Réseau et Internet → Wi-Fi (ou Ethernet) → Propriétés du matériel → **Attribution du serveur DNS** → Modifier → Manuel → IPv4 → saisir `1.1.1.1` et `1.0.0.1`.
+  - **Mac** : Réglages Système → Réseau → Wi-Fi → **Détails…** → **DNS** → bouton **+** → ajouter `1.1.1.1` et `1.0.0.1` → **OK**. Ou dans le Terminal :
+    ```bash
+    networksetup -setdnsservers Wi-Fi 1.1.1.1 1.0.0.1
+    ```
+    Pour revenir en arrière :
+    ```bash
+    networksetup -setdnsservers Wi-Fi empty
+    ```
+- Pour vérifier ce que voit le Mac : `dig +short www.quickpara.ma` doit afficher des adresses Cloudflare (par exemple `188.114.96.3`). Une réponse vide signifie que l'ancien cache est toujours là.
+- Ça se résout seul au bout de quelques heures au plus.
 
 ---
 
