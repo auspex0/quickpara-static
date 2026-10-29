@@ -18,6 +18,7 @@ Pas de paiement en ligne, pas de gestion de stock.
 | Document | Pour qui | Contenu |
 |---|---|---|
 | [**GUIDE-DEPLOIEMENT.md**](GUIDE-DEPLOIEMENT.md) | La personne qui met le site en ligne | Mise en ligne pas à pas, passage à une nouvelle version, Google Search Console, sauvegarde, dépannage |
+| [**COMMENT-CA-MARCHE.md**](COMMENT-CA-MARCHE.md) | La personne qui gère la boutique (non technique) | Où vit le site : Cloudflare, GitHub, nom de domaine, WhatsApp ; qui touche à quoi |
 | [**MANUEL-UTILISATEUR.md**](MANUEL-UTILISATEUR.md) | La personne qui gère la boutique (non technique) | Utiliser la console, traiter les commandes, problèmes courants |
 | [**PLAN-V2.md**](PLAN-V2.md) | Développeurs | Plan et notes techniques de la version 2 |
 

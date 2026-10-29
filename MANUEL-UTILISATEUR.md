@@ -2,6 +2,8 @@
 
 *Pour la personne qui gère la boutique. Aucune connaissance technique n'est nécessaire.*
 
+*Pour savoir où vit le site (Cloudflare, GitHub, nom de domaine, WhatsApp), voir le petit guide [Comment ça marche](COMMENT-CA-MARCHE.md).*
+
 ---
 
 ## 1. En deux mots : comment ça marche
