@@ -124,21 +124,47 @@ Si une de ces vérifications échoue, voir « Dépannage » plus bas.
 ## Étape 11 — Brancher quickpara.ma
 Deux situations.
 
-### a) Le plus simple : confier le domaine à Cloudflare
-1. https://dash.cloudflare.com → **Add a domain** (ou « Ajouter un site ») → saisir `quickpara.ma` → choisir le plan **Free**.
-2. Cloudflare affiche **deux serveurs de noms** (par exemple `xxx.ns.cloudflare.com`). Les noter.
-3. Aller chez le **registrar** où vous avez acheté quickpara.ma, dans la gestion du domaine → section **DNS / Serveurs de noms (nameservers)** → remplacer les serveurs actuels par les deux de Cloudflare → enregistrer.
-4. Attendre que Cloudflare confirme que le domaine est « Active » (de quelques minutes à 24 h, parfois 48 h).
-5. Ensuite : Cloudflare → **Workers & Pages** → projet **quickpara** → onglet **Custom domains** → **Set up a custom domain** → `quickpara.ma` → confirmer. Faire de même pour `www.quickpara.ma`.
-6. Le certificat HTTPS (cadenas) est créé automatiquement, en quelques minutes.
+> **Si vous utilisez une adresse e-mail @quickpara.ma, lisez l'encadré « Ne pas casser les e-mails » ci-dessous AVANT de changer les serveurs de noms.**
 
-> Je n'ai pas pu tester le transfert des serveurs de noms d'un domaine en `.ma` : la procédure est standard, mais si votre registrar ou Cloudflare refuse, utilisez en attendant l'adresse gratuite `quickpara.pages.dev` et demandez au support de votre registrar comment changer les serveurs de noms.
+### a) Le plus simple : confier le domaine à Cloudflare
+1. https://dash.cloudflare.com (compte qui contient le projet `quickpara`) → **Add a domain** (ou « Ajouter un site ») → saisir `quickpara.ma` → laisser la détection automatique des enregistrements DNS → choisir le plan **Free**.
+2. Cloudflare affiche la page **« Review your DNS records »**. **Ne cliquez pas tout de suite sur « Continue »** : comparez cette liste avec celle de votre hébergeur DNS (voir l'encadré ci-dessous), supprimez les anciens enregistrements du site (par exemple vers Vercel) et ajoutez ceux qui manquent. Ensuite seulement : **Continue to activation**.
+   - Un message « quickpara.ma is not fully protected » peut s'afficher parce que tous les enregistrements sont en « DNS only ». **C'est normal** : les enregistrements e-mail ne doivent jamais être proxifiés. Cliquer **I'll do this later**.
+3. Cloudflare affiche **deux serveurs de noms** (par exemple `xxx.ns.cloudflare.com`). Les noter.
+4. Aller chez le **registrar / hébergeur DNS** où vous avez acheté quickpara.ma → section **Serveurs DNS / Nameservers** → choisir « serveurs de noms personnalisés » → saisir les deux serveurs de Cloudflare, **vider les autres champs** → enregistrer. (Si une option **DNSSEC** est activée chez eux, la désactiver d'abord.)
+5. Dans Cloudflare, cliquer **Check nameservers now**. Attendre que le domaine soit « Active » (quelques minutes à 24 h, parfois 48 h ; un e-mail de confirmation arrive).
+6. Ensuite : Cloudflare → **Workers & Pages** → cliquer le projet **quickpara** (il porte l'étiquette *Pages* ; **ne pas créer de Worker**) → onglet **Custom domains** → **Set up a custom domain** → `quickpara.ma` → **Activate domain**. Refaire pour `www.quickpara.ma`.
+7. Le certificat HTTPS (cadenas) est créé automatiquement : état « Initializing » pendant quelques minutes, puis « Active ».
+
+> Testé avec un domaine `.ma` dont le DNS était chez Nindohost : le transfert des serveurs de noms vers Cloudflare fonctionne. Si votre registrar refuse, utilisez en attendant `quickpara.pages.dev`.
+
+#### Ne pas casser les e-mails (important)
+Les e-mails @quickpara.ma dépendent d'enregistrements DNS que Cloudflare **ne détecte pas toujours** à l'import. Avant de changer les serveurs de noms :
+
+1. Ouvrir la liste des enregistrements chez l'ancien hébergeur DNS (capture d'écran).
+2. Vérifier que **chacun** se retrouve dans Cloudflare : `MX`, les `A` des serveurs de messagerie (par exemple `forward`, `mail`), les `TXT` (SPF, DKIM, DMARC).
+3. Ajouter à la main ce qui manque, avec **Proxy status = DNS only (nuage gris)** pour **tous** les enregistrements e-mail. Un enregistrement e-mail proxifié (nuage orange) casse la réception.
+4. Exemple vécu : l'import avait oublié l'enregistrement `A` du serveur de messagerie (`forward`) et la clé **DKIM** (`default._domainkey`, un `TXT` d'environ 400 caractères). Sans le premier, plus de courrier reçu ; sans le second, le courrier envoyé finit plus souvent en spam.
+5. Valeur exacte d'un enregistrement chez l'ancien hébergeur (sans recopier à la main), dans PowerShell :
+   ```powershell
+   Resolve-DnsName -Name default._domainkey.quickpara.ma -Type TXT -Server ns1.nindohost.net | ForEach-Object { $_.Strings -join '' }
+   ```
+   (remplacer le nom et le serveur). **À faire avant** le changement de serveurs de noms.
+6. Après le changement, comparer : même commande avec `-Server` = l'un des deux serveurs Cloudflare. Les valeurs doivent être **identiques**.
+7. Envoyer un e-mail de test **vers** et **depuis** l'adresse @quickpara.ma.
+
+**À savoir :** si le domaine a **deux enregistrements SPF** (`v=spf1 …` deux fois), c'est invalide et peut faire rejeter du courrier. Ne pas régler ça pendant la migration ; fusionner en un seul enregistrement une fois que tout fonctionne.
 
 ### b) Seulement un sous-domaine (`www`)
-Si vous ne pouvez pas changer les serveurs de noms : chez votre registrar, créer un enregistrement **CNAME** `www` pointant vers `quickpara.pages.dev`, puis ajouter `www.quickpara.ma` dans **Custom domains** (étape 11-a-5). Le domaine « nu » (`quickpara.ma` sans `www`) ne fonctionnera alors pas sans Cloudflare comme serveur DNS.
+Si vous ne pouvez pas changer les serveurs de noms : chez votre registrar, créer un enregistrement **CNAME** `www` pointant vers `quickpara.pages.dev`, puis ajouter `www.quickpara.ma` dans **Custom domains** (étape 11-a-6). Le domaine « nu » (`quickpara.ma` sans `www`) ne fonctionnera alors pas sans Cloudflare comme serveur DNS.
 
 ## Étape 12 — Dernière vérification
-Ouvrir **https://quickpara.ma** (et `/admin`) sur ordinateur **et** sur téléphone, passer une commande test complète, puis supprimer le produit de test si besoin.
+Ouvrir **https://quickpara.ma**, **https://www.quickpara.ma** et **https://quickpara.ma/admin** sur ordinateur **et** sur téléphone, passer une commande test complète, puis supprimer le produit de test si besoin.
+
+**Si une adresse « ne se trouve pas » alors que l'autre fonctionne** : c'est presque toujours le cache DNS de votre ordinateur ou de votre box, qui a mémorisé l'ancienne réponse « ce nom n'existe pas ». Le site, lui, est en ligne.
+- Vider le cache de l'ordinateur : `ipconfig /flushdns` (PowerShell), et dans Chrome `chrome://net-internals/#dns` → **Clear host cache**.
+- Tester depuis le téléphone en **4G/5G** (Wi-Fi coupé) : si ça marche, c'est bien un cache local.
+- Sinon redémarrer la box, ou régler le DNS de l'ordinateur sur `1.1.1.1`. Ça se résout seul au bout de quelques heures au plus.
 
 ---
 
