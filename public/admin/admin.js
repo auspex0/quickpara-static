@@ -467,10 +467,16 @@
     $("#o-list").addEventListener("change", function (e) {
       if (!e.target.classList.contains("o-st")) return;
       var row = e.target.closest(".order"), id = row.getAttribute("data-id"), status = e.target.value;
+      var prev = row.className.replace(/^.*\bst-(\w+).*$/, "$1");
+      var labelOf = function (k) { return ORDER_STATUS.filter(function (s) { return s.key === k; })[0].label; };
+      var num = row.querySelector(".o-num").firstChild.textContent;
+      if (!confirm("Commande " + num + " : passer de « " + labelOf(prev) + " » à « " + labelOf(status) + " » ?")) {
+        e.target.value = prev;
+        return;
+      }
       api("PUT", "/orders/" + id, { status: status })
         .then(function () {
-          var label = ORDER_STATUS.filter(function (s) { return s.key === status; })[0].label;
-          toast("Statut : " + label);
+          toast("Statut : " + labelOf(status));
           row.className = "order st-" + status;
           return loadOrders(false);
         })
