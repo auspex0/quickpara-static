@@ -266,16 +266,27 @@
         '<a href="#" class="btn btn-wa" data-wa-ask data-ask-q="' + esc(state.q) + '">Demandez-nous sur WhatsApp</a></div>';
       return;
     }
-    $("#grid").innerHTML = list.map(function (p) {
+    $("#grid").innerHTML = list.map(function (p, index) {
       return '<article class="card" data-id="' + esc(p.id) + '">' +
         '<div class="card-visual ' + tone(p) + '">' + visual(p) + "</div>" +
         '<div class="card-body">' +
           (p.brand ? '<span class="brand">' + esc(p.brand) + "</span>" : "") +
           "<h3>" + esc(p.name) + "</h3>" +
-          '<p class="desc">' + esc(p.desc || "") + "</p>" +
+          '<p class="desc" id="desc-' + index + '">' + esc(p.desc || "") + "</p>" +
+          '<button class="desc-toggle" type="button" aria-expanded="false" aria-controls="desc-' + index + '" hidden>Voir plus</button>' +
           '<div class="card-foot">' + cardFooter(p) + "</div>" +
         "</div></article>";
     }).join("");
+    updateDescriptionToggles();
+  }
+
+  function updateDescriptionToggles() {
+    document.querySelectorAll(".card .desc").forEach(function (desc) {
+      var button = desc.nextElementSibling;
+      if (button.getAttribute("aria-expanded") !== "true") {
+        button.hidden = desc.scrollHeight <= desc.clientHeight + 1;
+      }
+    });
   }
 
   function refreshCard(id) {
@@ -505,7 +516,17 @@
       renderGrid();
     });
 
+    window.addEventListener("resize", updateDescriptionToggles);
+
     $("#grid").addEventListener("click", function (e) {
+      var toggle = e.target.closest(".desc-toggle");
+      if (toggle) {
+        var expanded = toggle.getAttribute("aria-expanded") === "true";
+        toggle.setAttribute("aria-expanded", String(!expanded));
+        toggle.textContent = expanded ? "Voir plus" : "Voir moins";
+        toggle.previousElementSibling.classList.toggle("expanded", !expanded);
+        return;
+      }
       var retry = e.target.closest("[data-retry]");
       if (retry) { boot(); return; }
       onStepperClick(e, function (b) { var c = b.closest(".card"); return c && c.getAttribute("data-id"); });
